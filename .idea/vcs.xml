@@ -3,5 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/GraduPro/image-processing-from-scratch" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/app/libs/image-processing-from-scratch" vcs="Git" />
   </component>
 </project>
