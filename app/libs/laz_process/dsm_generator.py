@@ -1,8 +1,8 @@
 import numpy as np
 import laspy
 from PIL import Image
-from scipy import ndimage
 from scipy.interpolate import griddata
+from tifffile import imwrite
 
 
 class DSM:
@@ -20,8 +20,9 @@ class DSM:
         self.heightRaster = None
         self.heightRasterFilled = None
         self._rasterize()
+        self.outlier_removal()
 
-        self.normalizedHeightRaster = np.zeros_like(self.heightRaster, dtype=float) + 255
+        self.normalizedHeightRaster = np.zeros_like(self.heightRaster, dtype=float)
         self.normalizedHeightRaster[self.heightRaster > 0] = (self.heightRaster[self.heightRaster > 0] -
                                                               np.min(self.heightRaster[self.heightRaster > 0])) / \
                                                              (np.max(self.heightRaster[self.heightRaster > 0]) -
@@ -92,5 +93,10 @@ class DSM:
         将高程栅格图像保存为灰度图像
         """
         dsm_image_array = (self.normalizedHeightRaster * 255).astype(np.uint8)
-        dsm_image = Image.fromarray(dsm_image_array, mode='L')
-        dsm_image.save(file_path)
+        imwrite(file_path, dsm_image_array)
+
+    def outlier_removal(self):
+        threshold_low = np.percentile(self.heightRaster[self.heightRaster > 0], 1)
+        threshold_high = np.percentile(self.heightRaster[self.heightRaster > 0], 99)
+        self.heightRaster[
+            (self.heightRaster > 0) & ((self.heightRaster < threshold_low) | (self.heightRaster > threshold_high))] = 0
